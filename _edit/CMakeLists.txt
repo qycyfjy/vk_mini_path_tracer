@@ -7,6 +7,7 @@ set(PROJNAME "vk_mini_path_tracer_${PROJNAME}")
 project(${PROJNAME})
 
 #####################################################################################
+# some macro defs: PROJECT_RELDIRECTORY, ...
 _add_project_definitions(${PROJNAME})
 
 #####################################################################################
