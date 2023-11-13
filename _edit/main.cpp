@@ -7,6 +7,9 @@
 #include <nvvk/resourceallocator_vk.hpp>  // NVVK memeory allocators, vulkan低级到没提供malloc
 #include <nvvk/structs_vk.hpp>  // vulkan使用sType成员变量来识别void*指向什么结构, 用nvvk::make简化这部分的初始化
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 static const uint64_t RENDER_WIDTH = 800;
 static const uint64_t RENDER_HEIGHT = 600;
 
@@ -64,12 +67,11 @@ int main(int argc, const char** argv) {
     memory_barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     memory_barrier.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
     vkCmdPipelineBarrier(cmd_buffer,
-        VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_HOST_BIT,
-
-        0,
-        1, &memory_barrier,
-        0, nullptr, 0, nullptr);
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_HOST_BIT,
+                         0,
+                         1, &memory_barrier,
+                         0, nullptr, 0, nullptr);
 
     NVVK_CHECK(vkEndCommandBuffer(cmd_buffer));
 
@@ -83,8 +85,7 @@ int main(int argc, const char** argv) {
 
     // GPU -> CPU
     void* data = allocator.map(buffer);
-    float* image = static_cast<float *>(data);
-    printf("first three: %f, %f, %f\n", image[0], image[1], image[2]);
+    stbi_write_hdr("out.hdr", RENDER_WIDTH, RENDER_HEIGHT, 3, static_cast<float *>(data));
     allocator.unmap(buffer);
 
     vkFreeCommandBuffers(context, cmd_pool, 1, &cmd_buffer);
